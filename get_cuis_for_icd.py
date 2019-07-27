@@ -5,6 +5,11 @@ import argparse
 import json
 import requests
 import sys
+import time
+
+
+# https://documentation.uts.nlm.nih.gov/terms-of-service.html
+# NLM requires that users send no more than 20 requests per second per IP address
 
 parser = argparse.ArgumentParser(description='Convert an input list of ICD9/10 codes into UMLS CUIs')
 parser.add_argument("-k", "--apikey", required = True, dest = "apikey", help = "API key from your UTS Profile (https://uts.nlm.nih.gov//uts.html#profile)")
@@ -42,6 +47,9 @@ def main(args):
             for result in results:
                 cui = result['ui']
                 print(f'{system}:{code} => {cui}')
+            
+            # Satisfy the UMLS limits conservatively -- this will max at 10/s when the limit is 20/s
+            time.sleep(0.1)
 
 
 if __name__ == '__main__':
